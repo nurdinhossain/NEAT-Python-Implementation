@@ -1,4 +1,4 @@
-import numpy as np
+import random
 
 class Network:
   def __init__(self, input_size, output_size):
@@ -43,4 +43,4 @@ class Network:
 
     for out in range(self.output_size): # 1
       for inp in range(self.input_size): # 9
-        self.connections.append([2 * np.random.random() - 1, [self.nodes[self.input_index][inp], self.nodes[self.output_index][out]], self.update_inn(), "ENABLED"])
+        self.connections.append([random.uniform(-1, 1), [self.nodes[self.input_index][inp], self.nodes[self.output_index][out]], self.update_inn(), "ENABLED"])
