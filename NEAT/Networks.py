@@ -1,6 +1,6 @@
 import Network
 import random
-import numpy as np
+import math
 from activations import sigmoid, relu, tanh
 
 Network = Network.Network
@@ -229,7 +229,7 @@ class Networks:
       if start_node[0] >= end_node[0]: # if start node is higher than end node or both reference the same node
         return None
 
-    new_connection = [2 * np.random.random() - 1, [start_node, end_node], network.update_inn(), "ENABLED"]
+    new_connection = [random.uniform(-1, 1), [start_node, end_node], network.update_inn(), "ENABLED"]
     if not new_connection[1] in [conn[1] for conn in conns]: # if connection does not exist
       updated_conns.append(new_connection)
       return updated_conns
@@ -246,9 +246,9 @@ class Networks:
     updated_conns = [[att for att in conn] for conn in conns]
     for conn in updated_conns:
       if random.random() <= self.uniform_change:
-        conn[0] += np.random.normal() / 50 # change weight by slight value
+        conn[0] += random.gauss(0, 1) / 50 # change weight by slight value
       else:
-        conn[0] = 2 * np.random.random() - 1 # completely changes weight
+        conn[0] = random.uniform(-1, 1) # completely changes weight
 
     return updated_conns
 
