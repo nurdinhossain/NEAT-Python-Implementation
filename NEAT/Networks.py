@@ -1,7 +1,6 @@
 import Network
 import random
 import math
-from activations import sigmoid, relu, tanh
 
 Network = Network.Network
 
