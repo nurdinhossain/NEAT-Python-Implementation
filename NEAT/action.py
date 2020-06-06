@@ -1,4 +1,4 @@
-def action(data, network, h_activation=relu, o_activation=sigmoid):
+def action(data, network, h_activation, o_activation):
   """
   Inputs data into a neural network and returns the raw output
 

@@ -1,8 +1,5 @@
-import Network
 import random
-import math
-
-Network = Network.Network
+from Network import Network
 
 class Networks:
   def __init__(self, population, input_size, output_size):
