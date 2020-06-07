@@ -20,7 +20,7 @@ To implement:
 
 What has it solved:
   - This implementation has successfully solved the XOR function and maxed out the score for OpenAI's cartpole environment.
-  - This implemntation is able to evolve populations in the game Snake and Flappy Bird (in examples folder)
+  - This implementation is also able to evolve populations in the game Snake and Flappy Bird (in examples folder)
   
 Examples
   - Snake: inspired by Sentdex/thenewboston - https://www.youtube.com/watch?v=K5F-aGDIYaM&list=PL6gx4Cwl9DGAjkwJocj7vlc_mFU-4wXJq
