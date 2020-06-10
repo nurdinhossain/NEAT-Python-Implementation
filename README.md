@@ -1,5 +1,5 @@
 # NEAT-Python-Implementation
-A Python implementation of Dr. Stanley's and Dr. Miikkulainen's NEAT algorithm.
+A Python implementation of Dr. Ken Stanley's and Dr. Risto Miikkulainen's NEAT algorithm.
 
 Original paper: http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
 
@@ -25,3 +25,5 @@ What has it solved:
 Examples
   - Snake: inspired by Sentdex/thenewboston - https://www.youtube.com/watch?v=K5F-aGDIYaM&list=PL6gx4Cwl9DGAjkwJocj7vlc_mFU-4wXJq
   - Flappy Bird: inspired by Code Bullet - https://www.youtube.com/watch?v=WSW-5m8lRMs
+  
+Special thanks to Dr. Stanley for helping me work out some bugs in the speciation function!
