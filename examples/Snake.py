@@ -6,6 +6,7 @@ from Network import Network
 from Networks import Networks
 from activations import sigmoid, relu, tanh
 from action import action
+import matplotlib.pyplot as plt
 
 pygame.init()
 
@@ -82,9 +83,13 @@ class Apple:
 def gameLoop():
     gameOver = False
     gameExit = False
-    populationSize = 50
-    snakeBrains = Networks(populationSize, 5, 4)
+    populationSize = 250
+    snakeBrains = Networks(populationSize, 7, 4)
+    #snakeBrains.new_node = 0.07
+    #snakeBrains.new_link = 0.1
     generations = 0
+    generations_list = []
+    avg_fitnesses = []
     while not gameExit:
         snakeSize = 10
         snakeX = round((displayWidth / 2) / snakeSize) * snakeSize
@@ -119,7 +124,7 @@ def gameLoop():
             outputs = []
             for network in range(len(snakeBrains.networks)):
                 current_snake = snakes[network]
-                inputs = [snakes[network].x - apples[network].x, snakes[network].y - apples[network].y]
+                inputs = [snakes[network].x - apples[network].x, snakes[network].y - apples[network].y, snakes[network].x - snakes[network].bodyX[-1], snakes[network].y - snakes[network].bodyY[-1]]
                 
                 # MOVING RIGHT - done
                 if current_snake.xSpeed > 0:
@@ -224,10 +229,7 @@ def gameLoop():
                             break
                         elif body_index == len(current_snake.bodyX) - 1:
                             inputs.append(0)
-                if len(inputs) > 5:
-                  print(inputs)
-                  print(len(inputs))
-                  print("Input size too big!")
+                            
                 output = action(inputs, snakeBrains.networks[network], sigmoid, sigmoid)
                 outputs.append(output)
 
@@ -267,7 +269,7 @@ def gameLoop():
                 snakes[snake].move()
                 if snakes[snake].alive:
                   if snakes[snake].x > apples[snake].x - (4 * snakeSize) and snakes[snake].x < apples[snake].x + (4 * snakeSize) and snakes[snake].y > apples[snake].y - (4 * snakeSize) and snakes[snake].y < apples[snake].y + (4 * snakeSize):
-                    #snakeBrains.networks[snake].fitness += 1
+                    #snakeBrains.networks[snake].fitness += 100
                     pass
 
             # DETECT BODY/WALL COLLISION
@@ -438,7 +440,7 @@ def gameLoop():
                       elif body_index == len(current_snake.bodyX) - 1:
                           inputs.append(0)
 
-              output = action(inputs, brain, h_activation=sigmoid)
+              output = action(inputs, brain, h_activation=sigmoid, o_activation=sigmoid)
 
               decision = "w"
               greatest_num = 0
@@ -489,9 +491,17 @@ def gameLoop():
               replay_time += 1
               pygame.display.update()
               clock.tick(fps)
+
+        generations_list.append(generations)
+        avg_fitnesses.append(sum([network.fitness for network in snakeBrains.networks]) / len([network.fitness for network in snakeBrains.networks]))
         
         snakeBrains.evolve(1, 0.8)
         gameOver = False
+    plt.plot(generations_list, avg_fitnesses)
+    plt.show()
+    while True:
+        if input("Break? y/n") == "y":
+            break
 
 gameLoop()
 pygame.quit()

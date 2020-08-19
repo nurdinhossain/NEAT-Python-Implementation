@@ -71,6 +71,8 @@ def gameLoop():
     gameExit = False
     populationSize = 500
     brains = Networks(populationSize, 4, 1)
+    brains.new_node = 0.05 # 0.05
+    brains.new_link = 0.07 # 0.07
     generations = []
     max_fitnesses = []
 

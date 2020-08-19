@@ -25,7 +25,7 @@ class Networks:
     self.c_one = 1
     self.c_two = 1
     self.c_three = 0.4 # 0.4
-    self.threshold = 3
+    self.threshold = 3 # 3
     self.compat_mod = 0.3
 
   def max_innovation(self, conns): # WORKS
@@ -41,8 +41,8 @@ class Networks:
     """
     Takes two connections and equalizes their lengths by filling in gaps with a blank list []
     """
-    conn_one_prepped = [[att for att in conn] for conn in conn_one]
-    conn_two_prepped = [[att for att in conn] for conn in conn_two]
+    conn_one_prepped = self.copy_conns(conn_one)
+    conn_two_prepped = self.copy_conns(conn_two)
 
     if self.max_innovation(conn_one) > self.max_innovation(conn_two):
       max_innov = self.max_innovation(conn_one)
@@ -63,6 +63,24 @@ class Networks:
         conn_two_prepped.append([])
 
     return conn_one_prepped, conn_two_prepped
+
+  def copy_node(self, node):
+    return [node[0], node[1], node[2]]
+
+  def copy_nodes(self, nodes):
+    cloned_nodes = []
+    for node_type in nodes:
+      cloned_nodes.append([self.copy_node(node) for node in node_type])
+    return cloned_nodes
+
+  def copy_conn(self, conn):
+    return [conn[0], [self.copy_node(conn[1][0]), self.copy_node(conn[1][1])], conn[2], conn[3]]
+
+  def copy_conns(self, conns):
+    cloned_conns = []
+    for conn in conns:
+      cloned_conns.append(self.copy_conn(conn))
+    return cloned_conns
 
   def avg_weight_diff(self, conn_one, conn_two, absolute_value=True): # WORKS
     """
@@ -97,11 +115,11 @@ class Networks:
     if max_innov_one > max_innov_two:
       for conn in conn_one:
         if conn[2] > max_innov_two:
-          excess_genes.append(conn)
+          excess_genes.append(self.copy_conn(conn))
     else:
       for conn in conn_two:
         if conn[2] > max_innov_one:
-          excess_genes.append(conn)
+          excess_genes.append(self.copy_conn(conn))
 
     return excess_genes, len(excess_genes)
 
@@ -178,10 +196,10 @@ class Networks:
 
     *Requires an unmodified genome
     """
-    updated_conns = [[att for att in conn] for conn in conns]
-    updated_nodes = [[node for node in node_type] for node_type in nodes]
+    updated_conns = self.copy_conns(conns)
+    updated_nodes = self.copy_nodes(nodes)
 
-    split_choices = [conn for conn in updated_conns if conn[1][0][0] < network.node_num + 1 and conn[1][1][-1] == 3 and conn[-1] == "ENABLED"] # choices include connections from input -> output or hidden -> output
+    split_choices = [conn for conn in updated_conns if conn[1][0][0] <= network.node_num and conn[1][1][-1] == 3 and conn[-1] == "ENABLED"] # choices include connections from input -> output or hidden -> output
     if len(split_choices) == 0:
       return None, None
 
@@ -193,7 +211,7 @@ class Networks:
     updated_conns[updated_conns.index(split_choices[split_conn_index])][-1] = "DISABLED" # disable split connection
     updated_nodes[self.hidden_index].append(new_node)
     updated_conns.append([1, [split_conn_start_node, new_node], network.update_inn(), "ENABLED"]) # connection going into new node
-    updated_conns.append([updated_conns[split_conn_index][0], [new_node, split_conn_end_node], network.update_inn(), "ENABLED"]) # connection leading out of new node
+    updated_conns.append([split_choices[split_conn_index][0], [new_node, split_conn_end_node], network.update_inn(), "ENABLED"]) # connection leading out of new node
 
     return updated_conns, updated_nodes
 
@@ -204,19 +222,14 @@ class Networks:
 
     *Requires an unmodified genome
     """
-    updated_conns = [[att for att in conn] for conn in conns]
+    updated_conns = self.copy_conns(conns)
 
     if nodes[self.hidden_index] == []:
       return None
     else:
       start_node_index = random.randrange(self.input_index, self.hidden_index + 1)
 
-    if start_node_index == self.input_index and nodes[self.hidden_index] == []:
-      out_node_index = self.output_index
-    elif start_node_index == self.input_index and nodes[self.hidden_index] != []:
-      out_node_index = random.randrange(self.hidden_index, self.output_index + 1)
-    elif start_node_index == self.hidden_index:
-      out_node_index = random.randrange(self.hidden_index, self.output_index + 1)
+    out_node_index = random.randrange(self.hidden_index, self.output_index + 1)
 
     start_node = random.choice(nodes[start_node_index])
     end_node = random.choice(nodes[out_node_index])
@@ -225,7 +238,7 @@ class Networks:
       if start_node[0] >= end_node[0]: # if start node is higher than end node or both reference the same node
         return None
 
-    new_connection = [random.uniform(-1, 1), [start_node, end_node], network.update_inn(), "ENABLED"]
+    new_connection = [random.uniform(-1, 1), [self.copy_node(start_node), self.copy_node(end_node)], network.update_inn(), "ENABLED"]
     if not new_connection[1] in [conn[1] for conn in conns]: # if connection does not exist
       updated_conns.append(new_connection)
       return updated_conns
@@ -239,7 +252,7 @@ class Networks:
 
     *Requires an unmodified genome
     """
-    updated_conns = [[att for att in conn] for conn in conns]
+    updated_conns = self.copy_conns(conns)
     for conn in updated_conns:
       if random.random() <= self.uniform_change:
         conn[0] += random.gauss(0, 1) / 50 # change weight by slight value
@@ -391,3 +404,5 @@ class Networks:
           offspring.append(child)
 
       self.networks = offspring.copy()
+      for network in self.networks:
+        network.fitness = 0
